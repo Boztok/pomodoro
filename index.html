@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<section class="main-container pd" id="main-container">
+    <div></div>
+    <div id="navigation">
+        <button data-modal-target="#modal" class="btn" id="setting">Setting</button>
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <div class="title">Setting</div>
+                <button data-close-button class="close-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-segment">
+                    <div class="setting-segment-tittle">&#128338 TIMER</div>
+                    <div>Time (minutes)</div>
+                    <div class="time-setting">
+                        <div>
+                            <label for="pomo-doro-time-input">Pomodoro</label>
+                            <input id="pomo-doro-time-input" type="number">
+                        </div>
+                        <div>
+                            <label for="short-break-time-input">Short Break</label>                           
+                            <input id="short-break-time-input" type="number">
+                        </div>
+                        <div>
+                            <label for="long-break-time-input">Long Break</label>
+                            <input id="long-break-time-input" type="number">
+                        </div> 
+                    </div>
+                    <div>
+                        <label for="">Long break interval</label>
+                        <input id="long-break-interval" type="number">
+                    </div>
+                    
+                </div>
+                <div class="setting-segment">
+                    <div class="setting-segment-tittle">&#128393; Theme</div>
+                    <label for="pomodoro-color-input">Pomodoro color</label>
+                    <input id="pomodoro-color-input" type="color">
+
+                    <label for="short-break-color-input">Short break color</label>
+                    <input id="short-break-color-input" type="color">
+
+                    <label for="long-break-color-input">Long break color</label>
+                    <input id="long-break-color-input" type="color">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button data-modal-ok-button id="modal-ok-button" class="OK-button">OK</button>
+            </div>
+        </div>
+        <div id="overlay" ></div>
+    </div>
+    <div class="timer">
+        <div class="type-selector">
+            <button id="pomoDoro">Pomodoro</button>
+            <button id="sBreak">Short Break</button>
+            <button id="lBreak">Long Break</button>
+        </div>
+        <div id="timer-string">25:00</div>
+        <div class="start-button">
+            <button id="start" class="s1">START</button>
+            <button class="next" id="next">&#8677;</button>
+        </div>
+    </div>
+    <div class="pomoDoro-counter">#1</div>
+    
+</section>
+
+
+
+
+
+    
+    <script src="app.js"></script>
+</body>
+</html>

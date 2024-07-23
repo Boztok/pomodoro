@@ -53,7 +53,10 @@ function startTimer(duration, display) {
 	}
 	intervalId = setInterval(() => {
 		if (--timer <= 0) {
+			changeState();
 			clearInterval(intervalId);
+			intervalId = null;
+			return;
 		}
 		const timeToMinutesAndSeconds = (time) => [
 			Math.floor(time / 60),
@@ -101,6 +104,34 @@ function setTimer(time, state, display = display) {
 	isTimerRunning = false;
 }
 
+function changeState () {
+	const handleNextState = (time, state) => {
+		curentTime = time;
+		//curentState = state;
+		clearInterval(intervalId);
+		intervalId = null;
+		isTimerRunning = false;
+		setTimer(time, state, display);
+	};
+	if (curentState === STATES.POMODORO) {
+		if (
+			pomoDoroCounter % longBreakInterval === 0 &&
+			pomoDoroCounter !== 0
+		) {
+			handleNextState(longBreakTime, STATES.LONG_BREAK);
+			pomoDoroCounter++;
+		} else {
+			handleNextState(shortBreakTime, STATES.SHORT_BREAK);
+		}
+	} else if (curentState === STATES.SHORT_BREAK) {
+		handleNextState(pomoDoroTime, STATES.POMODORO);
+		pomoDoroCounter++;
+	} else {
+		handleNextState(pomoDoroTime, STATES.POMODORO);
+	}
+	pomoDoroCounterText.textContent = '#' + pomoDoroCounter;
+}
+
 window.onload = function () {
 	pomoDoroColor.value = '#f6bd60';
 	shortBreakColor.value = '#f5cac3';
@@ -109,17 +140,30 @@ window.onload = function () {
 	isTimerRunning = false;
 	setTimer(curentTime, STATES.POMODORO, display);
 
-	const setButtons = (button, time, targetState) => {
-		button.addEventListener('click', function () {
-			curentTime = time;
+	const setButtons = (button, targetState) => {
+		button.addEventListener('click', ()=> {
+			switch (targetState) {
+				case STATES.POMODORO:
+					curentTime = pomoDoroTime;
+					break;
+				case STATES.SHORT_BREAK:
+					curentTime = shortBreakTime;
+					break;
+				case STATES.LONG_BREAK:
+					curentTime = longBreakTime;
+					break;
+				default:
+					break;
+			}
+
 			clearInterval(intervalId);
 			isTimerRunning = false;
 			setTimer(curentTime, targetState, display);
 		});
 	};
-	setButtons(pomoDoroButton, pomoDoroTime, STATES.POMODORO);
-	setButtons(shortBreakButton, shortBreakTime, STATES.SHORT_BREAK);
-	setButtons(longBreakButton, longBreakTime, STATES.LONG_BREAK);
+	setButtons(pomoDoroButton, STATES.POMODORO);
+	setButtons(shortBreakButton, STATES.SHORT_BREAK);
+	setButtons(longBreakButton, STATES.LONG_BREAK);
 
 	startStopButton.addEventListener('click', function () {
 		if (!isTimerRunning) {
@@ -127,7 +171,6 @@ window.onload = function () {
 			startStopButton.className = 'timer-running';
 			startStopButton.textContent = 'PAUSE';
 			isTimerRunning = true;
-			console.log('START');
 			nextButton.className = 'active';
 		} else {
 			clearInterval(intervalId);
@@ -139,33 +182,7 @@ window.onload = function () {
 		}
 	});
 
-	nextButton.addEventListener('click', function () {
-		const handleNextState = (time, state) => {
-			curentTime = time;
-			curentState = state;
-			clearInterval(intervalId);
-			intervalId = null;
-			isTimerRunning = false;
-			setTimer(curentTime, state, display);
-		};
-		if (curentState === STATES.POMODORO) {
-			if (
-				pomoDoroCounter % longBreakInterval === 0 &&
-				pomoDoroCounter !== 0
-			) {
-				handleNextState(longBreakTime, STATES.LONG_BREAK);
-				pomoDoroCounter++;
-			} else {
-				handleNextState(shortBreakTime, STATES.SHORT_BREAK);
-			}
-		} else if (curentState === STATES.SHORT_BREAK) {
-			handleNextState(pomoDoroTime, STATES.POMODORO);
-			pomoDoroCounter++;
-		} else {
-			handleNextState(pomoDoroTime, STATES.POMODORO);
-		}
-		pomoDoroCounterText.textContent = '#' + pomoDoroCounter;
-	});
+	nextButton.addEventListener('click', changeState);
 };
 
 function okModal() {
@@ -175,16 +192,16 @@ function okModal() {
 	longBreakInterval = longBreakIntervalInput.value;
 
 	if (curentState === STATES.POMODORO) {
-		setTimer(pomoDoroTime, STATES.POMODORO, display);
 		curentTime = pomoDoroTime;
+		setTimer(pomoDoroTime, STATES.POMODORO, display);
 	}
 	if (curentState === STATES.SHORT_BREAK) {
-		setTimer(shortBreakTime, STATES.SHORT_BREAK, display);
 		curentTime = shortBreakTime;
+		setTimer(shortBreakTime, STATES.SHORT_BREAK, display);	
 	}
 	if (curentState === STATES.LONG_BREAK) {
-		setTimer(longBreakTime, STATES.LONG_BREAK, display);
 		curentTime = longBreakTime;
+		setTimer(longBreakTime, STATES.LONG_BREAK, display);
 	}
 }
 

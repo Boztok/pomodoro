@@ -1,260 +1,244 @@
-const reset =document.querySelector('#reset') 
-var intervalId
+const reset = document.querySelector('#reset');
+let intervalId;
 
-function startTimer(duration, display){
-    var timer = duration, minutes, seconds;
-    intervalId = setInterval(function (){
-        minutes = parseInt(timer / 60, 10)
-        seconds = parseInt(timer % 60, 10);
+const startStopButton = document.querySelector('#start-button');
+const pomoDoroButton = document.querySelector('#pomodoro-button');
+const shortBreakButton = document.querySelector('#short-break-button');
+const longBreakButton = document.querySelector('#long-break-button');
 
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
-        display.textContent = minutes + ":" + seconds;
-        
-        if(--timer < 0){
-            clearInterval(intervalId);
-            
-        }
-        console.log("inside" + intervalId)
-    }, 1000);
-    startButton.addEventListener('click', function () {
-            curentTime = timer;     
-    });  
-}
-
-var startButton;
-var pomoDoroButton;
-var sBreakButton;
-var lBreakButton;
-
-var curentState = 'pd';
-
-var curentTime;
-var pomoDoroTime;
-var sBreakTime;
-var lBreakTime;
-var isTimerRunning;
-
-var pomoDoroTimerInput;
-var shortBreakTimerInput;
-var longBreakTimerInput;
-var longBreakIntervalInput;
-
-
-var container = document.getElementById('main-container');
-
-function TimerSetter(curentTime, stateName, display){
-    clearInterval(intervalId);
-    var minutes = parseInt(curentTime / 60, 10)
-    var seconds = parseInt(curentTime % 60, 10);
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    seconds = seconds < 10 ? "0" + seconds : seconds;
-    display.textContent = minutes + ":" + seconds;
-    
-    if(stateName !== ""){
-        console.log(stateName)
-        curentState = stateName;
-        if(stateName ==="pd") container.style.backgroundColor = pomoDoroColor.value;
-        else if(stateName ==="sb") container.style.backgroundColor = shortBreakColor.value;
-        else if(stateName ==="lb") container.style.backgroundColor = longBreakColor.value;
-    }
-    nextButton.classList.remove('active');
-    
-
-    startButton.className = 's1';
-    startButton.textContent = "START";
-    isTimerRunning = false;
-    
-}
-var display;
-window.onload = function (){
-    display = document.querySelector('#timer-string');
-    startButton = document.getElementById('start');
-    pomoDoroButton = document.getElementById('pomoDoro');
-    sBreakButton = document.getElementById('sBreak');
-    lBreakButton = document.getElementById('lBreak');
-    
-    pomoDoroTimerInput = document.getElementById('pomo-doro-time-input');
-    shortBreakTimerInput = document.getElementById('short-break-time-input');
-    longBreakTimerInput = document.getElementById('long-break-time-input');
-    longBreakIntervalInput = document.getElementById('long-break-interval');
-
-    pomoDoroColor = document.getElementById('pomodoro-color-input');
-    shortBreakColor = document.getElementById('short-break-color-input');
-    longBreakColor = document.getElementById('long-break-color-input');
-
-    pomoDoroColor.value = "#f6bd60";
-    shortBreakColor.value = "#f5cac3";
-    longBreakColor.value = "#f28482";
-
-    
-    pomoDoroTime = 60 * 25;
-    sBreakTime = 60 * 1;
-    lBreakTime = 60 * 3;
-    curentTime = pomoDoroTime;
-    
-    isTimerRunning = false;
-    
-    TimerSetter(curentTime, "pd", display);
-
-    pomoDoroButton.addEventListener('click', function () {
-        curentTime = pomoDoroTime;
-        clearInterval(intervalId);
-        isTimerRunning = false;
-        TimerSetter(curentTime, "pd" , display);
-    });
-    sBreakButton.addEventListener('click', function () {
-        curentTime = sBreakTime;
-        clearInterval(intervalId);
-        isTimerRunning = false;
-        TimerSetter(curentTime, "sb", display);
-    });
-
-    lBreakButton.addEventListener('click', function () {
-        curentTime = lBreakTime;
-        clearInterval(intervalId);
-        isTimerRunning = false;
-        TimerSetter(curentTime, "lb", display);
-
-    });
-
-    startButton.addEventListener('click', function () {
-        if(!isTimerRunning){
-            startTimer(curentTime,display);
-            startButton.className = 's2';
-            startButton.textContent = "PAUSE";
-            isTimerRunning = true;
-            console.log("START")
-            nextButton.classList.add('active');
-        }
-        else{
-            
-            console.log(intervalId)
-            clearInterval(intervalId);
-            intervalId = null;
-            startButton.className = 's1';
-            startButton.textContent = "START";
-            isTimerRunning = false;
-            nextButton.classList.remove('active');
-            
-        }
-    });
-    
-    nextButton.addEventListener('click', function (){
-        if(curentState === 'pd' ){ 
-            if(pomoDoroCounter % longBreakInterval === 0 && pomoDoroCounter !== 0){ //if the user had x amount of break then the next break is a long break
-                curentTime = lBreakTime;
-                curentState = 'lb';
-                clearInterval(intervalId);
-                isTimerRunning = false;
-                TimerSetter(curentTime, "lb", display);
-                
-                pomoDoroCounter++;
-            }
-            else{                               //else just a short break
-                curentTime = sBreakTime;
-                curentState = 'sb';
-                clearInterval(intervalId);
-                isTimerRunning = false;
-                TimerSetter(curentTime, "sb", display);
-            }
-        }
-        else if(curentState === 'sb'){ 
-            curentTime = pomoDoroTime;
-            curentState = 'pd';
-            clearInterval(intervalId);
-            isTimerRunning = false;
-            TimerSetter(curentTime, "pd" , display);
-            pomoDoroCounter++;
-        }
-        else{
-            curentTime = pomoDoroTime;
-            curentState = 'pd';
-            clearInterval(intervalId);
-            isTimerRunning = false;
-            TimerSetter(curentTime, "pd" , display);                       
-        }
-        pomoDoroCounterText.textContent = "#"+pomoDoroCounter;
-    });
+const STATES = {
+	POMODORO: 'pd',
+	SHORT_BREAK: 'sb',
+	LONG_BREAK: 'lb',
 };
 
-const pomoDoroCounterText = document.querySelector('.pomoDoro-counter');
-var pomoDoroCounter = 0;
-var longBreakInterval = 4;
+let curentState = STATES.POMODORO;
+const MINUTE = 60;
 
-const openModalButtons = document.querySelectorAll('[data-modal-target]')
-const closeModalButtons = document.querySelectorAll('[data-close-button]')
-const okModalButtons = document.querySelectorAll('[data-modal-ok-button]')
-const overlay = document.getElementById('overlay')
-const nextButton = document.getElementById('next')
+let curentTime;
+let pomoDoroTime = 25 * MINUTE;
+let shortBreakTime = 5 * MINUTE;
+let longBreakTime = 15 * MINUTE;
+let isTimerRunning;
 
-var pomoDoroColor; 
-var shortBreakColor; 
-var longBreakColor; 
+const pomoDoroTimerInput = document.querySelector('#pomo-doro-time-input');
+const shortBreakTimerInput = document.querySelector('#short-break-time-input');
+const longBreakTimerInput = document.querySelector('#long-break-time-input');
+const longBreakIntervalInput = document.querySelector('#long-break-interval');
 
-openModalButtons.forEach(button => {
-    button.addEventListener('click', () =>{
-        const modal = document.querySelector(button.dataset.modalTarget)
-        openModal(modal)
-    })
-})
+const pomoDoroColor = document.querySelector('#pomodoro-color-input');
+const shortBreakColor = document.querySelector('#short-break-color-input');
+const longBreakColor = document.querySelector('#long-break-color-input');
 
-closeModalButtons.forEach(button => {
-    button.addEventListener('click', () =>{
-        const modal = button.closest('.modal')
-        closeModal(modal)
-    })
-})
+const pomoDoroCounterText = document.querySelector('#pomoDoro-counter');
+let pomoDoroCounter = 0;
+let longBreakInterval = 4;
 
-okModalButtons.forEach(button => {
-    button.addEventListener('click', () =>{
-        const modal = button.closest('.modal')
-        okModal();
-        closeModal(modal);
-    })
-})
+const openModalButtons = document.querySelectorAll('[data-modal-target]');
+const closeModalButtons = document.querySelectorAll('[data-close-button]');
+const okModalButtons = document.querySelectorAll('[data-modal-ok-button]');
+const overlay = document.querySelector('#overlay');
+const nextButton = document.querySelector('#next');
 
-function okModal(){
-    pomoDoroTime = pomoDoroTimerInput.value * 60;
-    sBreakTime = shortBreakTimerInput.value * 60;
-    lBreakTime = longBreakTimerInput.value * 60;
-    longBreakInterval = longBreakIntervalInput.value;
+const container = document.querySelector('#main-container');
+const display = document.querySelector('#timer-string');
 
-    pomoDoroColor
+function startTimer(duration, display) {
+	let timer = duration,
+		minutes,
+		seconds;
 
-    if(container.classList.contains('pd')){
-        curentTime = pomoDoroTime;
-        TimerSetter(pomoDoroTime,"pd",display);
-        
-    } 
-    if(container.classList.contains('sb')){
-        TimerSetter(sBreakTime,"sb",display);
-        curentTime = sBreakTime;
-    } 
-    if(container.classList.contains('lb')){
-        TimerSetter(lBreakTime,"lb",display);
-        curentTime = lBreakTime;
-    } 
+	if (intervalId) {
+		throw new Error('Interval already exists!');
+	}
+	intervalId = setInterval(() => {
+		if (--timer <= 0) {
+			changeState();
+			clearInterval(intervalId);
+			intervalId = null;
+			return;
+		}
+		const timeToMinutesAndSeconds = (time) => [
+			Math.floor(time / 60),
+			time % 60,
+		];
+		[minutes, seconds] = timeToMinutesAndSeconds(timer);
+		display.textContent =
+			`${minutes}`.padStart(2, '0') + ':' + `${seconds}`.padStart(2, '0');
+	}, 1000);
+	startStopButton.addEventListener('click', () => {
+		curentTime = timer;
+	});
 }
 
-function openModal(modal){
-    if(modal == null) return
-    modal.classList.add('active')
-    overlay.classList.add('active')
-    pomoDoroTimerInput.value = pomoDoroTime/60;
-    shortBreakTimerInput.value = sBreakTime/60;
-    longBreakTimerInput.value = lBreakTime/60;
-    longBreakIntervalInput.value = longBreakInterval;
-    
+function setTimer(time, state, display = display) {
+	clearInterval(intervalId);
+	let timer = time,
+		minutes,
+		seconds;
+	const timeToMinutesAndSeconds = (time) => [
+		Math.floor(time / 60),
+		time % 60,
+	];
+	[minutes, seconds] = timeToMinutesAndSeconds(timer);
+	display.textContent =
+		`${minutes}`.padStart(2, '0') + ':' + `${seconds}`.padStart(2, '0');
+
+	curentState = state;
+	switch (state) {
+		case STATES.POMODORO:
+			container.style.backgroundColor = pomoDoroColor.value;
+			break;
+		case STATES.SHORT_BREAK:
+			container.style.backgroundColor = shortBreakColor.value;
+			break;
+		case STATES.LONG_BREAK:
+			container.style.backgroundColor = longBreakColor.value;
+			break;
+		default:
+			break;
+	}
+	nextButton.className = 'inactive';
+	startStopButton.className = 'timer-stoped';
+	startStopButton.textContent = 'START';
+	isTimerRunning = false;
 }
 
-function closeModal(modal){
-    if(modal == null) return
-    modal.classList.remove('active')
-    overlay.classList.remove('active')
+function changeState () {
+	const handleNextState = (time, state) => {
+		curentTime = time;
+		//curentState = state;
+		clearInterval(intervalId);
+		intervalId = null;
+		isTimerRunning = false;
+		setTimer(time, state, display);
+	};
+	if (curentState === STATES.POMODORO) {
+		if (
+			pomoDoroCounter % longBreakInterval === 0 &&
+			pomoDoroCounter !== 0
+		) {
+			handleNextState(longBreakTime, STATES.LONG_BREAK);
+			pomoDoroCounter++;
+		} else {
+			handleNextState(shortBreakTime, STATES.SHORT_BREAK);
+		}
+	} else if (curentState === STATES.SHORT_BREAK) {
+		handleNextState(pomoDoroTime, STATES.POMODORO);
+		pomoDoroCounter++;
+	} else {
+		handleNextState(pomoDoroTime, STATES.POMODORO);
+	}
+	pomoDoroCounterText.textContent = '#' + pomoDoroCounter;
 }
 
+window.onload = function () {
+	pomoDoroColor.value = '#f6bd60';
+	shortBreakColor.value = '#f5cac3';
+	longBreakColor.value = '#f28482';
+	curentTime = pomoDoroTime;
+	isTimerRunning = false;
+	setTimer(curentTime, STATES.POMODORO, display);
 
+	const setButtons = (button, targetState) => {
+		button.addEventListener('click', ()=> {
+			switch (targetState) {
+				case STATES.POMODORO:
+					curentTime = pomoDoroTime;
+					break;
+				case STATES.SHORT_BREAK:
+					curentTime = shortBreakTime;
+					break;
+				case STATES.LONG_BREAK:
+					curentTime = longBreakTime;
+					break;
+				default:
+					break;
+			}
 
+			clearInterval(intervalId);
+			isTimerRunning = false;
+			setTimer(curentTime, targetState, display);
+		});
+	};
+	setButtons(pomoDoroButton, STATES.POMODORO);
+	setButtons(shortBreakButton, STATES.SHORT_BREAK);
+	setButtons(longBreakButton, STATES.LONG_BREAK);
 
+	startStopButton.addEventListener('click', function () {
+		if (!isTimerRunning) {
+			startTimer(curentTime, display);
+			startStopButton.className = 'timer-running';
+			startStopButton.textContent = 'PAUSE';
+			isTimerRunning = true;
+			nextButton.className = 'active';
+		} else {
+			clearInterval(intervalId);
+			intervalId = null;
+			startStopButton.className = 'timer-stoped';
+			startStopButton.textContent = 'START';
+			isTimerRunning = false;
+			nextButton.className = 'inactive';
+		}
+	});
+
+	nextButton.addEventListener('click', changeState);
+};
+
+function okModal() {
+	pomoDoroTime = pomoDoroTimerInput.value * MINUTE;
+	shortBreakTime = shortBreakTimerInput.value * MINUTE;
+	longBreakTime = longBreakTimerInput.value * MINUTE;
+	longBreakInterval = longBreakIntervalInput.value;
+
+	if (curentState === STATES.POMODORO) {
+		curentTime = pomoDoroTime;
+		setTimer(pomoDoroTime, STATES.POMODORO, display);
+	}
+	if (curentState === STATES.SHORT_BREAK) {
+		curentTime = shortBreakTime;
+		setTimer(shortBreakTime, STATES.SHORT_BREAK, display);	
+	}
+	if (curentState === STATES.LONG_BREAK) {
+		curentTime = longBreakTime;
+		setTimer(longBreakTime, STATES.LONG_BREAK, display);
+	}
+}
+
+function openModal(modal) {
+	if (modal == null) return;
+	modal.classList.add('active');
+	overlay.classList.add('active');
+	pomoDoroTimerInput.value = pomoDoroTime / 60;
+	shortBreakTimerInput.value = shortBreakTime / 60;
+	longBreakTimerInput.value = longBreakTime / 60;
+	longBreakIntervalInput.value = longBreakInterval;
+}
+
+function closeModal(modal) {
+	if (modal == null) return;
+	modal.classList.remove('active');
+	overlay.classList.remove('active');
+}
+
+openModalButtons.forEach((button) => {
+	button.addEventListener('click', () => {
+		const modal = document.querySelector(button.dataset.modalTarget);
+		openModal(modal);
+	});
+});
+
+closeModalButtons.forEach((button) => {
+	button.addEventListener('click', () => {
+		const modal = button.closest('.my-modal');
+		closeModal(modal);
+	});
+});
+
+okModalButtons.forEach((button) => {
+	button.addEventListener('click', () => {
+		const modal = button.closest('.my-modal');
+		okModal();
+		closeModal(modal);
+	});
+});

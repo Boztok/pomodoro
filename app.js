@@ -157,6 +157,7 @@ window.onload = function () {
 			}
 
 			clearInterval(intervalId);
+			intervalId = null;
 			isTimerRunning = false;
 			setTimer(curentTime, targetState, display);
 		});
